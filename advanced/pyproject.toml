@@ -10,3 +10,8 @@ dev = [
     "mypy>=1.15.0",
     "ruff>=0.11.11",
 ]
+
+[tool.uv.workspace]
+members = [
+    "basic/01_avg",
+]
