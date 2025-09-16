@@ -1,0 +1,40 @@
+import os
+import tempfile
+
+import torch
+from torch.nn import CrossEntropyLoss
+from torch.optim import Adam
+from torch.utils.data import DataLoader
+from torchvision.models import resnet18
+from torchvision.datasets import FashionMNIST
+from torchvision.transforms import ToTensor, Normalize, Compose
+
+# Model, Loss, Optimizer
+model = resnet18(num_classes=10)
+model.conv1 = torch.nn.Conv2d(
+    1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False
+)
+model.to("cpu")
+criterion = CrossEntropyLoss()
+optimizer = Adam(model.parameters(), lr=0.001)
+
+# Data
+transform = Compose([ToTensor(), Normalize((0.28604,), (0.32025,))])
+train_data = FashionMNIST(root='./data', train=True, download=False, transform=transform)
+train_loader = DataLoader(train_data, batch_size=128, shuffle=True)
+
+# Training
+for epoch in range(1):
+    for images, labels in train_loader:
+        images, labels = images.to("cpu"), labels.to("cpu")
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+    metrics = {"loss": loss.item(), "epoch": epoch}
+    checkpoint_dir = tempfile.mkdtemp()
+    checkpoint_path = os.path.join(checkpoint_dir, "model.pt")
+    torch.save(model.state_dict(), checkpoint_path)
+    print(metrics)

@@ -1,0 +1,7 @@
+[project]
+name = "01-ollama"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "flytekitplugins-inference>=1.16.4",
+]
