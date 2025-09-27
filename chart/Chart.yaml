@@ -1,0 +1,24 @@
+apiVersion: v2
+name: chart
+description: A Helm chart for Kubernetes
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+
+dependencies:
+  - name: docker-registry
+    version: 2.2.2
+    repository: https://helm.twun.io/
+    condition: docker-regitry.enabled
+  - name: minio
+    version: 12.6.7
+    repository: https://charts.bitnami.com/bitnami
+    condition: minio.enabled
+  - name: postgresql
+    version: 12.8.1
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: flyte-binary
+    version: 1.16.0
+    repository: https://flyteorg.github.io/flyte
+    condition: flyte-binary.enabled

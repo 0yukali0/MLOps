@@ -1,0 +1,80 @@
+docker-registry:
+  enabled: true
+  persistence:
+    enabled: false
+  service:
+    type: NodePort
+    nodePort: 30000
+
+minio:
+  enabled: true
+  nameOverride: "minio"
+  fullnameOverride: "minio"
+  image:
+    repository: minio/minio
+    tag: RELEASE.2025-07-18T21-56-31Z
+  command: ["minio"]
+  args: ["server", "/data", "--console-address", ":9001"]  
+
+postgresql:
+  enabled: true
+  nameOverride: "postgres"
+  fullnameOverride: "postgres"
+  auth:
+    username: flyte
+    postgresPassword: postgres
+    database: flyte
+    password: "postgres"
+  shmVolume:
+    enabled: false
+  primary:
+    service:
+      type: NodePort
+      nodePorts:
+        postgresql: 30001
+
+flyte-binary:
+  enabled: true
+  configuration:
+    database:
+      username: flyte
+      host: postgres.flyte.svc.cluster.local
+      dbname: flyte
+    storage:
+      type: minio
+      metadataContainer: flyte #This is the default bucket created with Minio. Controlled by the MINIO_DEFAULT_BUCKETS env var in the local-flyte-resources.yaml manifest
+      userDataContainer: flyte
+      provider: s3
+      providerConfig:
+        s3:
+          authType: "accesskey"
+          endpoint: "http://minio.flyte.svc.cluster.local:9000"
+          accessKey: "minio"
+          secretKey: "miniostorage" #If you need to change this parameters, refer to the local-flyte-resources.yaml manifest and adjust the MINIO_ROOT_PASSWORD env var
+          disableSSL: "true"
+          secure: "false"
+          v2Signing: "true"
+
+    inlineSecretRef: flyte-binary-inline-config-secret
+    inline:
+      plugins:
+        k8s:
+          inject-finalizer: true
+          default-env-vars:
+            - FLYTE_AWS_ENDPOINT: "http://minio.flyte.svc.cluster.local:9000"
+            - FLYTE_AWS_ACCESS_KEY_ID: "minio"
+            - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage" #Use the same value as the MINIO_ROOT_PASSWORD
+      storage:
+        signedURL:
+          stowConfigOverride:
+            endpoint: http://localhost:30088
+
+      task_resources:
+        defaults:
+          cpu: 100m
+          memory: 500Mi #change default requested resources and limits to fit your needs
+        limits:
+          memory: 2Gi
+
+  serviceAccount:
+    create: true
