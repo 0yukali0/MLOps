@@ -21,3 +21,10 @@ xgb_train_image = ImageSpec(
     python_version="3.12",
     registry=registry_path
 )
+
+visual_image = ImageSpec(
+    name="visual_tools",
+    packages=["pandas==2.3.3", "flytekitplugins-deck-standard", "ydata-profiling"],
+    python_version="3.12",
+    registry=registry_path
+)

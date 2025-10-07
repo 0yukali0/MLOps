@@ -538,6 +538,18 @@ wheels = [
 ]
 
 [[package]]
+name = "flytekitplugins-deck-standard"
+version = "1.16.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flytekit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/53/57/12114f433602c11ee8d8181cb11a9b5a6901b0e8cdad66c46989d5eb14f9/flytekitplugins_deck_standard-1.16.5.tar.gz", hash = "sha256:2cf9f545d86ecbe2cbffb6996d80a6971bd80ebc2cf1a15993aaa3f5ca48050e", size = 6362, upload-time = "2025-09-25T19:15:45.239Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/11/25/e530b5ca931abf9d07f2ccbf7f4459d5e61712a6b017bab28f7128703634/flytekitplugins_deck_standard-1.16.5-py3-none-any.whl", hash = "sha256:1fd5f4fe5dd18fd8354a1a31b813785d8075f9241632ba7c6c5e295d5bf8fb93", size = 6573, upload-time = "2025-09-25T19:15:00.904Z" },
+]
+
+[[package]]
 name = "frozenlist"
 version = "1.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1530,6 +1542,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "flytekit" },
+    { name = "flytekitplugins-deck-standard" },
     { name = "pandas" },
     { name = "scikit-learn" },
     { name = "xgboost" },
@@ -1538,6 +1551,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "flytekit", specifier = ">=1.16.5" },
+    { name = "flytekitplugins-deck-standard", specifier = ">=1.16.5" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "scikit-learn", specifier = ">=1.7.2" },
     { name = "xgboost", specifier = ">=3.0.5" },

@@ -3,6 +3,28 @@ import pandas as pd
 from src.orchestration.constants import eda_image
 
 @fl.task(container_image=eda_image, cache=fl.Cache(version="1.0", serialize=True), limits=fl.Resources(mem="10Gi", cpu="2", ephemeral_storage="20Gi"))
+def accounts(transaction_path: str = "s3://data/accounts/acct_transaction.csv") -> fl.FlyteFile:
+    transaction_file = fl.FlyteFile.from_source(transaction_path)
+    with open(transaction_file, "r") as f:
+        txn = pd.read_csv(f)
+    from_df = (
+        df.loc[df["from_acct_type"] == 1, ["from_acct"]]
+        .drop_duplicates()
+        .rename(columns={"from_acct": "acct"})
+    )
+
+    to_df = (
+        df.loc[df["to_acct_type"] == 1, ["to_acct"]]
+        .drop_duplicates()
+        .rename(columns={"to_acct": "acct"})
+    )
+
+    acct_df = pd.concat([from_df, to_df]).drop_duplicates(subset=["acct"])
+    acct_df.to_csv("unique_acct.csv", index=False)
+    return fl.FlyteFile(path="unique_acct.csv")
+
+
+@fl.task(container_image=eda_image, cache=fl.Cache(version="1.0", serialize=True), limits=fl.Resources(mem="10Gi", cpu="2", ephemeral_storage="20Gi"))
 def eda(
         transaction_path: str = "s3://data/accounts/acct_transaction.csv",
         alert_path: str = "s3://data/accounts/acct_alert.csv",
@@ -34,4 +56,4 @@ def eda(
     features["label"] = features["label"].fillna(0).astype(int)
 
     features.to_csv("acct_features.csv", index=False)
-    return fl.FlyteFile(path="acct_features.csv",)
+    return fl.FlyteFile(path="acct_features.csv")
