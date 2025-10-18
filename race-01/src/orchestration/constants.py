@@ -1,30 +1,43 @@
-from flytekit import ImageSpec
+from flytekit import ImageSpec, kwtypes
 
-registry_path = "localhost:30000"
+REGISTRY_URI = "localhost:30000"
+PYTHON_VERSION = "3.12"
 
-local_data_image = ImageSpec(
-    name="local_csv",
-    copy=["data"],
-    registry=registry_path
+# original csv format
+acct_transaction_cols = kwtypes(
+    from_ACCT=str,
+    from_acct_type=str,
+    to_acct=str,
+    to_acct_type=str,
+    is_self_txn=str,
+    txn_amt=int,
+    txn_date=str,
+    txn_time=str,
+    currency_type=str,
+    channel_type=str,
 )
 
+acct_alert_cols = kwtypes(acct=str, event_date=str)
+
+local_data_image = ImageSpec(name="local_csv", copy=["data"], registry=REGISTRY_URI)
+
 eda_image = ImageSpec(
-    name="eda",
-    packages=["pandas==2.3.3"],
-    python_version="3.12",
-    registry=registry_path
+    name="k9s",
+    packages=["pandas==2.3.3", "pyarrow", "fastparquet"],
+    python_version=PYTHON_VERSION,
+    registry=REGISTRY_URI,
 )
 
 xgb_train_image = ImageSpec(
     name="xgb_model",
     packages=["xgboost==3.0.5", "pandas==2.3.3", "scikit-learn==1.7.2"],
-    python_version="3.12",
-    registry=registry_path
+    python_version=PYTHON_VERSION,
+    registry=REGISTRY_URI,
 )
 
 visual_image = ImageSpec(
     name="visual_tools",
     packages=["pandas==2.3.3", "flytekitplugins-deck-standard", "ydata-profiling"],
-    python_version="3.12",
-    registry=registry_path
+    python_version=PYTHON_VERSION,
+    registry=REGISTRY_URI,
 )
