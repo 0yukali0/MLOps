@@ -1,6 +1,8 @@
 import flytekit as fl
-from src.tasks.upload import image_2_object
+
 from src.tasks.train import train_yolov8
+from src.tasks.upload import image_2_object
+
 
 @fl.workflow()
 def main_wf() -> fl.FlyteFile:
