@@ -1,0 +1,5 @@
+train: ./data/training_image
+val: ./data/train_label
+
+nc: 1  # 類別數
+names: ["heart"]

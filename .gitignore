@@ -1,3 +1,6 @@
 **/__pycache__/
+**/.ruff_cache
+**/.venv
+**/runs
 **/data/
 **/lightning_train/lightning_logs/
