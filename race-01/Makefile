@@ -1,4 +1,5 @@
 .PHONY: fmt
 fmt:
-	ruff format
-	ruff check . --fix
+	isort src
+	ruff format src
+	ruff check src --fix

@@ -5,7 +5,7 @@ PYTHON_VERSION = "3.12"
 
 # original csv format
 acct_transaction_cols = kwtypes(
-    from_ACCT=str,
+    from_acct=str,
     from_acct_type=str,
     to_acct=str,
     to_acct_type=str,
@@ -18,6 +18,11 @@ acct_transaction_cols = kwtypes(
 )
 
 acct_alert_cols = kwtypes(acct=str, event_date=str)
+
+# result cols
+acct_cols = kwtypes(
+    acct=str, account_type=int, owner_type=int, acct_alert_recv=int, acct_alert_send=int
+)
 
 local_data_image = ImageSpec(name="local_csv", copy=["data"], registry=REGISTRY_URI)
 

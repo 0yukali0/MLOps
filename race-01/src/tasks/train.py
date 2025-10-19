@@ -1,7 +1,8 @@
 import flytekit as fl
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+
 from src.core.model import xgb_classifier
 from src.orchestration.constants import xgb_train_image
 
