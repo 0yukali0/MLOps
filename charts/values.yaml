@@ -1,0 +1,9 @@
+nfs:
+  enabled: true
+  nfs:
+    server: 192.168.50.244
+    path: /var/nfsshare
+  storageClass:
+    annotations:
+      storageclass.kubernetes.io/is-default-class: "true"
+
