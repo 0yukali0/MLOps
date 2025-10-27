@@ -1,0 +1,12 @@
+dependencies:
+- name: nfs-subdir-external-provisioner
+  repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+  version: 4.0.18
+- name: minio
+  repository: https://charts.min.io/
+  version: 5.4.0
+- name: flyte-binary
+  repository: https://flyteorg.github.io/flyte
+  version: v1.16.1
+digest: sha256:5238c5c3570027a2b7f9f3ef85a8bdd8c38ff05e659e488c79a7b7e038e4da37
+generated: "2025-10-27T09:27:58.313103563+08:00"

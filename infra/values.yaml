@@ -1,0 +1,79 @@
+nfs:
+  enabled: true
+  nfs:
+    server: 192.168.50.244
+    path: /var/nfsshare
+  storageClass:
+    annotations:
+      storageclass.kubernetes.io/is-default-class: "true"
+
+minio:
+  enabled: true
+  fullnameOverride: minio
+  mode: standalone
+  rootUser: minio
+  rootPassword: miniostorage
+  buckets:
+    - name: flyte
+      policy: none
+      purge: false
+  consoleService:
+    type: NodePort
+    nodePort: 30002
+
+sql:
+  image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
+  imagePolicy: IfNotPresent
+  user: postgres
+  password: flyte
+  dbName: flyte
+
+flytebinary:
+  enabled: true
+  fullnameOverride: "flyte-binary"
+
+  deployment:
+    waitForDB:
+      image:
+        repository: postgres
+        tag: "16"
+        pullPolicy: IfNotPresent
+
+  configuration:
+    database:
+      username: postgres
+      password: flyte
+      host: postgres.default.svc.cluster.local
+      dbname: flyte
+    storage:
+      type: minio
+      metadataContainer: flyte
+      userDataContainer: flyte
+      provider: s3
+      providerConfig:
+        s3:
+          authType: "accesskey"
+          endpoint: "http://minio.default.svc.cluster.local:9000"
+          accessKey: "minio"
+          secretKey: "miniostorage"
+          secure: "false"
+          v2Signing: "true"
+
+    inline:
+      plugins:
+        k8s:
+          inject-finalizer: true
+          default-env-vars:
+            - FLYTE_AWS_ENDPOINT: "http://minio.default.svc.cluster.local:9000"
+            - FLYTE_AWS_ACCESS_KEY_ID: "minio"
+            - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage"
+
+    task_resources:
+      defaults:
+        cpu: 100m
+        memory: 500Mi
+      limits:
+        memory: 2Gi
+
+  serviceAccount:
+    create: true
