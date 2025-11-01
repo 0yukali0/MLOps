@@ -8,5 +8,8 @@ dependencies:
 - name: flyte-binary
   repository: https://flyteorg.github.io/flyte
   version: v1.16.1
-digest: sha256:5238c5c3570027a2b7f9f3ef85a8bdd8c38ff05e659e488c79a7b7e038e4da37
-generated: "2025-10-27T09:27:58.313103563+08:00"
+- name: mlflow
+  repository: https://community-charts.github.io/helm-charts
+  version: 1.7.3
+digest: sha256:c8d591c68d05eead777698aa93ab603ae9370b4bb478d1c277fbd3275697804f
+generated: "2025-10-30T07:57:44.744349185+08:00"

@@ -9,14 +9,19 @@ dependencies:
     alias: nfs
     version: 4.0.18
     repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
-    condition: nfs.enabled
+    condition: helmList.storage.nfs
   - name: minio
     alias: minio
     version: 5.4.0
     repository: https://charts.min.io/
-    condition: minio.enabled
+    condition: helmList.storage.minio
   - name: flyte-binary 
     alias: flytebinary
     version: v1.16.1
     repository: https://flyteorg.github.io/flyte
-    condition: flytebinary.enabled
+    condition: helmList.ml.flyte.binary
+  - name: mlflow
+    alias: mlflow
+    version: 1.7.3
+    repository: https://community-charts.github.io/helm-charts
+    condition: helmList.ml.mlflow

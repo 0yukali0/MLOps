@@ -1,5 +1,13 @@
+helmList:
+  storage:
+    nfs: true
+    minio: true
+  ml:
+    flyte:
+      binary: true
+    mlflow: true
+
 nfs:
-  enabled: true
   nfs:
     server: 192.168.50.244
     path: /var/nfsshare
@@ -8,7 +16,6 @@ nfs:
       storageclass.kubernetes.io/is-default-class: "true"
 
 minio:
-  enabled: true
   fullnameOverride: minio
   mode: standalone
   rootUser: minio
@@ -28,8 +35,12 @@ sql:
   password: flyte
   dbName: flyte
 
+mlflow:
+  nameOverride: mlflow
+  fullnameOverride: mlflow
+
+
 flytebinary:
-  enabled: true
   fullnameOverride: "flyte-binary"
 
   deployment:
