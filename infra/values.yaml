@@ -2,10 +2,21 @@ helmList:
   storage:
     nfs: true
     minio: true
+    dockerRegistry: true
   ml:
     flyte:
       binary: true
     mlflow: true
+    spark: false
+    ray: true
+    dask: true
+
+docker:
+  persistence:
+    enabled: false
+  service:
+    type: NodePort
+    nodePort: 30000
 
 nfs:
   nfs:
@@ -29,7 +40,7 @@ minio:
     nodePort: 30002
 
 sql:
-  image: ecr.flyte.org/ubuntu/postgres:13-21.04_beta
+  image: postgres:16
   imagePolicy: IfNotPresent
   user: postgres
   password: flyte
@@ -69,6 +80,15 @@ flytebinary:
           secretKey: "miniostorage"
           secure: "false"
           v2Signing: "true"
+      
+    clusterResourceTemplates:
+      inline:
+        - key: aa_namespace
+          value: |
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: {{ namespace }}
 
     inline:
       plugins:
@@ -81,10 +101,28 @@ flytebinary:
 
     task_resources:
       defaults:
-        cpu: 100m
-        memory: 500Mi
+        cpu: 1
+        memory: 10Gi
       limits:
-        memory: 2Gi
+        memory: 10Gi
 
   serviceAccount:
     create: true
+
+  enabled_plugins:
+    tasks:
+      task-plugins:
+        enabled-plugins:
+          - container
+          - sidecar
+          - k8s-array
+          - connector-service
+          - echo
+          - ray
+          - dask
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          container_array: k8s-array
+          ray: ray
+          dask: dask

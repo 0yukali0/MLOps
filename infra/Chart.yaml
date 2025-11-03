@@ -25,3 +25,23 @@ dependencies:
     version: 1.7.3
     repository: https://community-charts.github.io/helm-charts
     condition: helmList.ml.mlflow
+  - name: spark-operator
+    alias: spark
+    version: 2.3.0
+    repository: https://kubeflow.github.io/spark-operator
+    condition: helmList.ml.spark
+  - name: kuberay-operator 
+    alias: ray
+    version: 1.1.0
+    repository: https://ray-project.github.io/kuberay-helm/
+    condition: helmList.ml.ray
+  - name: dask-kubernetes-operator
+    alias: dask
+    version: 2025.7.0
+    repository: https://helm.dask.org
+    condition: helmList.ml.dask
+  - name: docker-registry
+    alias: docker
+    version: 2.2.2
+    repository: https://helm.twun.io/
+    condition: helmList.storage.dockerRegistry

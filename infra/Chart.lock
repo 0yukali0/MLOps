@@ -11,5 +11,17 @@ dependencies:
 - name: mlflow
   repository: https://community-charts.github.io/helm-charts
   version: 1.7.3
-digest: sha256:c8d591c68d05eead777698aa93ab603ae9370b4bb478d1c277fbd3275697804f
-generated: "2025-10-30T07:57:44.744349185+08:00"
+- name: spark-operator
+  repository: https://kubeflow.github.io/spark-operator
+  version: 2.3.0
+- name: kuberay-operator
+  repository: https://ray-project.github.io/kuberay-helm/
+  version: 1.1.0
+- name: dask-kubernetes-operator
+  repository: https://helm.dask.org
+  version: 2025.7.0
+- name: docker-registry
+  repository: https://helm.twun.io/
+  version: 2.2.2
+digest: sha256:087487f11206c03b433933beda1a3361427422d1ac0afd347659a4b85a9cce93
+generated: "2025-11-03T07:30:03.124848899+08:00"
