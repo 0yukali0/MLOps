@@ -5,9 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "fastparquet>=2024.11.0",
     "flytekit>=1.16.5",
     "flytekitplugins-deck-standard>=1.16.5",
     "pandas>=2.3.3",
+    "pyarrow>=22.0.0",
     "scikit-learn>=1.7.2",
     "xgboost>=3.0.5",
 ]

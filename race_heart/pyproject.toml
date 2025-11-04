@@ -1,0 +1,18 @@
+[project]
+name = "race_heart"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dvc>=3.63.0",
+    "dvc-s3>=3.2.2",
+    "flytekit>=1.16.5",
+    "ultralytics>=8.3.217",
+]
+
+[dependency-groups]
+dev = [
+    "isort>=7.0.0",
+    "ruff>=0.14.1",
+]

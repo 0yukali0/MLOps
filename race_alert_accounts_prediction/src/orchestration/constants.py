@@ -35,14 +35,26 @@ eda_image = ImageSpec(
 
 xgb_train_image = ImageSpec(
     name="xgb_model",
-    packages=["xgboost==3.0.5", "pandas==2.3.3", "scikit-learn==1.7.2"],
+    packages=[
+        "xgboost==3.0.5",
+        "pandas==2.3.3",
+        "scikit-learn==1.7.2",
+        "pyarrow",
+        "fastparquet",
+    ],
     python_version=PYTHON_VERSION,
     registry=REGISTRY_URI,
 )
 
 visual_image = ImageSpec(
     name="visual_tools",
-    packages=["pandas==2.3.3", "flytekitplugins-deck-standard", "ydata-profiling"],
+    packages=[
+        "pandas==2.3.3",
+        "flytekitplugins-deck-standard",
+        "ydata-profiling",
+        "pyarrow",
+        "fastparquet",
+    ],
     python_version=PYTHON_VERSION,
     registry=REGISTRY_URI,
 )

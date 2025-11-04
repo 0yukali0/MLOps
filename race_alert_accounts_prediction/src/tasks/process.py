@@ -1,14 +1,7 @@
 import flytekit as fl
 import pandas as pd
-from flytekit.types.structured.structured_dataset import StructuredDataset
-from typing_extensions import Annotated
 
-from src.orchestration.constants import (
-    acct_alert_cols,
-    acct_cols,
-    acct_transaction_cols,
-    eda_image,
-)
+from src.orchestration.constants import eda_image
 
 
 @fl.task(
@@ -16,98 +9,111 @@ from src.orchestration.constants import (
     cache=fl.Cache(version="1.0", serialize=True),
     limits=fl.Resources(mem="10Gi", cpu="2", ephemeral_storage="20Gi"),
 )
-def load_acct_transaction(
-    path: str,
-) -> Annotated[StructuredDataset, acct_transaction_cols]:
+def download(path: str) -> fl.FlyteFile:
     data = fl.FlyteFile.from_source(path)
     with open(data, "r") as f:
         df = pd.read_csv(f)
-    return StructuredDataset(dataframe=df)
+    print(df.columns)
+    df.to_csv("data.csv")
+    return fl.FlyteFile(path="data.csv")
 
-@fl.task(
-    container_image=eda_image,
-    cache=fl.Cache(version="1.0", serialize=True),
-    limits=fl.Resources(mem="10Gi", cpu="2", ephemeral_storage="20Gi"),
-)
-def load_acct_alert(path: str) -> Annotated[StructuredDataset, acct_alert_cols]:
-    data = fl.FlyteFile.from_source(path)
-    with open(data, "r") as f:
-        df = pd.read_csv(f)
-    return StructuredDataset(dataframe=df)
 
-@fl.task(
-    container_image=eda_image,
-    cache=fl.Cache(version="1.0", serialize=True),
-    limits=fl.Resources(mem="10Gi", cpu="2", ephemeral_storage="20Gi"),
-)
-def initialize(
-    df: Annotated[StructuredDataset, acct_transaction_cols],
-) -> Annotated[StructuredDataset, acct_cols]:
-    df = df.open(pd.DataFrame).all()
-    acct_cols = [
-        "acct",
-        "account_type",
-        "owner_type",
-        "acct_alert_recv",
-        "acct_alert_send",
-    ]
-    accounts = pd.DataFrame(columns=acct_cols)
-    for row in df.itertuples(index=False):
-        if row.from_acct_type == "01":
-            acct: str = row.from_acct
-            if acct not in accounts["acct"].values:
-                accounts.loc[len(accounts)] = {
-                    "acct": acct,
-                    "account_type": 0,
-                    "owner_type": 0,
-                    "acct_alert_recv": 0,
-                    "acct_alert_send": 0,
-                }
-        if row.to_acct_type == "01":
-            acct: str = row.to_acct
-            if acct not in accounts["acct"].values:
-                accounts.loc[len(accounts)] = {
-                    "acct": acct,
-                    "account_type": 0,
-                    "owner_type": 0,
-                    "acct_alert_recv": 0,
-                    "acct_alert_send": 0,
-                }
-    return StructuredDataset(dataframe=accounts)
-
-@fl.task(
-    container_image=eda_image,
-    cache=fl.Cache(version="1.0", serialize=True),
-    limits=fl.Resources(mem="10Gi", cpu="2", ephemeral_storage="20Gi"),
-)
-def attach_account_type(df: Annotated[StructuredDataset, acct_cols], alert_df: Annotated[StructuredDataset, acct_alert_cols]) -> Annotated[StructuredDataset, acct_cols]:
-    df = df.open(pd.DataFrame).all()
-    for row in df.itertuples(index=False):
-        from_acct_is_alert = False
-        to_acct_is_alert = False
-        if row.from_acct_type == "01":
-            acct = row.from_acct
-            from_acct_is_alert = is_alert_account(acct=acct, alert_df=alert_df)
-
-        if row.to_acct_type == "01":
-            acct = row.to_acct
-            to_acct_is_alert = is_alert_account(acct=acct, alert_df=alert_df)
-
-        if row.from_acct_type == "01" and to_acct_is_alert:
-            df.loc[df["acct"] == row.from_acct, "acct_alert_recv"] += 1
-            
-        if row.to_acct_type == "01" and from_acct_is_alert:
-            df.loc[df["acct"] == row.to_acct, "acct_alert_send"] += 1
-
-    return StructuredDataset(dataframe=df)
-
-@fl.task(
-    container_image=eda_image,
-    cache=fl.Cache(version="1.0", serialize=True),
-    limits=fl.Resources(mem="5Gi", cpu="1", ephemeral_storage="10Gi"),
-)
-def is_alert_account(acct: str, alert_df: Annotated[StructuredDataset, acct_alert_cols]) -> bool:
-    alert_df = alert_df.open(pd.DataFrame).all()
-    if acct in accounts["acct"].values:
+def is_alert_account(
+    acct: str,
+    alert_df: pd.DataFrame,
+) -> bool:
+    if acct in alert_df["acct"].values:
         return True
     return False
+
+
+@fl.task(
+    container_image=eda_image,
+    cache=fl.Cache(version="1.0", serialize=True),
+    limits=fl.Resources(mem="20Gi", cpu="8", ephemeral_storage="20Gi"),
+)
+def initialize(
+    transaction_path: fl.FlyteFile,
+    alert_path: fl.FlyteFile,
+) -> fl.FlyteFile:
+    with open(transaction_path, "r") as f:
+        df = pd.read_csv(f)
+    print(df.columns)
+    with open(alert_path, "r") as f:
+        alert_df = pd.read_csv(f)
+    print(alert_df.columns)
+
+    # 合併所有帳號（from + to），去重
+    from_df = df[["from_acct", "from_acct_type"]].rename(
+        columns={"from_acct": "acct", "from_acct_type": "acct_type"}
+    )
+    to_df = df[["to_acct", "to_acct_type"]].rename(
+        columns={"to_acct": "acct", "to_acct_type": "acct_type"}
+    )
+    all_accts = pd.concat([from_df, to_df], ignore_index=True).drop_duplicates(
+        subset=["acct"]
+    )
+
+    # 建立 accounts DataFrame
+    accounts = pd.DataFrame()
+    accounts["acct"] = all_accts["acct"]
+    accounts["account_type"] = accounts["acct"].isin(alert_df["acct"]).astype(int)
+    accounts["owner_type"] = (all_accts["acct_type"] == "01").astype(int)
+    accounts["acct_alert_recv"] = 0
+    accounts["acct_alert_send"] = 0
+
+    # 輸出
+    accounts.to_csv("result.csv", index=False)
+    return fl.FlyteFile(path="result.csv")
+
+
+@fl.task(
+    container_image=eda_image,
+    #cache=fl.Cache(version="1.0", serialize=True),
+    limits=fl.Resources(mem="10Gi", cpu="2", ephemeral_storage="20Gi"),
+)
+def attach_account_type(
+    transaction_path: fl.FlyteFile,
+    alert_path: fl.FlyteFile,
+    result_path: fl.FlyteFile,
+) -> fl.FlyteFile:
+    with open(transaction_path, "r") as f:
+        transaction_df = pd.read_csv(f)
+
+    with open(alert_path, "r") as f:
+        alert_df = pd.read_csv(f)
+
+    with open(result_path, "r") as f:
+        result = pd.read_csv(f)
+
+    alert_set = set(alert_df["acct"])
+    # 只考慮 from_acct_type 和 to_acct_type == "01"
+    from_alert_mask = transaction_df["from_acct"].isin(alert_set)
+    to_alert_mask = transaction_df["to_acct"].isin(alert_set)
+
+    # 計算 acct_alert_recv
+    recv_counts = (
+        transaction_df.loc[to_alert_mask, ["from_acct"]]
+        .groupby("from_acct")
+        .size()
+        .rename("acct_alert_recv")
+    )
+    result = result.merge(recv_counts, how="left", left_on="acct", right_on="from_acct")
+    result["acct_alert_recv"] = result["acct_alert_recv_y"].fillna(0).astype(int)
+    result.drop(
+        columns=["from_acct", "acct_alert_recv_y"], inplace=True, errors="ignore"
+    )
+
+    # 計算 acct_alert_send
+    send_counts = (
+        transaction_df.loc[from_alert_mask, ["to_acct"]]
+        .groupby("to_acct")
+        .size()
+        .rename("acct_alert_send")
+    )
+    result = result.merge(send_counts, how="left", left_on="acct", right_on="to_acct")
+    result["acct_alert_send"] = result["acct_alert_send_y"].fillna(0).astype(int)
+    result.drop(columns=["to_acct", "acct_alert_send_y"], inplace=True, errors="ignore")
+
+    result.to_csv("result.csv")
+    return fl.FlyteFile(path="result.csv")
