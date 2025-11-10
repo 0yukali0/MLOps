@@ -7,7 +7,7 @@ helmList:
     flyte:
       binary: true
     mlflow: true
-    spark: false
+    spark: true
     ray: true
     dask: true
 
@@ -20,7 +20,7 @@ docker:
 
 nfs:
   nfs:
-    server: 192.168.50.244
+    server: 192.168.50.17
     path: /var/nfsshare
   storageClass:
     annotations:
@@ -98,6 +98,22 @@ flytebinary:
             - FLYTE_AWS_ENDPOINT: "http://minio.default.svc.cluster.local:9000"
             - FLYTE_AWS_ACCESS_KEY_ID: "minio"
             - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage"
+        spark:
+          spark-config-default:
+            - spark.driver.cores: "1"
+            - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
+            - spark.hadoop.fs.s3a.endpoint: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
+            - spark.hadoop.fs.s3a.access.key: "minio"
+            - spark.hadoop.fs.s3a.secret.key: "miniostorage"
+            - spark.hadoop.fs.s3a.path.style.access: "true"
+            - spark.kubernetes.allocation.batch.size: "50"
+            - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+            - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+            - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+            - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+            - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+            - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+            - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
 
     task_resources:
       defaults:

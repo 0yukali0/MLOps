@@ -1,0 +1,12 @@
+[project]
+name = "mcp_drivers"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.0.5",
+    "langchain-mcp-adapters>=0.1.12",
+    "langchain-ollama>=1.0.0",
+    "mcp>=1.21.0",
+]

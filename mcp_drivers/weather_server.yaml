@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-weather
+  labels:
+    app: weather
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather
+  template:
+    metadata:
+      labels:
+        app: weather
+    spec:
+      containers:
+      - name: weather
+        image: docker.io/0yukali0/mcp:weather 
+        ports:
+        - containerPort: 8000
+        imagePullPolicy: Always
+        command: ["python"]
+        args: ["main.py"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather
+spec:
+  type: NodePort
+  selector:
+    app: weather
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 31000
