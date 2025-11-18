@@ -1,4 +1,8 @@
 helmList:
+  lb:
+    metallb: true
+  ingress:
+    traefik: true
   storage:
     nfs: true
     minio: true
@@ -10,6 +14,22 @@ helmList:
     spark: true
     ray: true
     dask: true
+
+traefik:
+  ingressRoute:
+    dashboard:
+      enabled: true
+      matchRule: Host(`yuteng.com`)
+      entryPoints:
+        - web
+  providers:
+    kubernetesGateway:
+      enabled: true
+  gateway:
+    listeners:
+      web:
+        namespacePolicy:
+          from: All
 
 docker:
   persistence:

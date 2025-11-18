@@ -43,5 +43,15 @@ dependencies:
   - name: docker-registry
     alias: docker
     version: 2.2.2
-    repository: https://helm.twun.io/
+    repository: https://twuni.github.io/docker-registry.helm
     condition: helmList.storage.dockerRegistry
+  - name: traefik
+    alias: traefik
+    version: 37.3.0
+    repository: https://traefik.github.io/charts
+    condition: helmList.ingress.traefik
+  - name: metallb
+    alias: metallb
+    version: 0.15.2
+    repository: https://metallb.github.io/metallb
+    condition: helmList.lb.metallb
