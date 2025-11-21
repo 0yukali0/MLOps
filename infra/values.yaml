@@ -10,10 +10,10 @@ helmList:
   ml:
     flyte:
       binary: true
-    mlflow: true
-    spark: true
-    ray: true
-    dask: true
+    mlflow: false
+    spark: false
+    ray: false
+    dask: false
 
 traefik:
   ingressRoute:
@@ -72,6 +72,25 @@ mlflow:
 
 
 flytebinary:
+  flyte-core-components:
+    admin:
+      seedProjects:
+        - flytesnacks
+      seedProjectsWithDetails:
+        - name: flytesnacks
+          description: Default project setup.
+
+  auth:
+    enabled: false
+    oidc:
+      baseUrl: ''
+      clientId: ''
+      clientSecret: ''
+    internal:
+      clientSecret: ''
+      clientSecretHash: ''
+    authorizedUris: []
+  
   fullnameOverride: "flyte-binary"
 
   deployment:
