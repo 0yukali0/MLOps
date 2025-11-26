@@ -1,0 +1,16 @@
+[project]
+name = "flyte-production"
+version = "0.1.0"
+description = "A Flyte production project"
+readme = "README.md"
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "flytekit",
+    "pydicom>=2.4.4",
+]
+
+[dependency-groups]
+dev = [
+    "isort>=6.1.0",
+    "ruff>=0.14.6",
+]
