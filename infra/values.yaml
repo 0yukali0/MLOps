@@ -1,8 +1,8 @@
 helmList:
   lb:
-    metallb: true
+    metallb: false
   ingress:
-    traefik: true
+    traefik: false
   storage:
     nfs: true
     minio: true
@@ -10,10 +10,10 @@ helmList:
   ml:
     flyte:
       binary: true
-    mlflow: false
-    spark: false
-    ray: false
-    dask: false
+    mlflow: true
+    spark: true
+    ray: true
+    dask: true
 
 traefik:
   ingressRoute:
@@ -80,6 +80,38 @@ flytebinary:
         - name: flytesnacks
           description: Default project setup.
 
+  rbac:
+    extraRules:
+      - apiGroups:
+        - ray.io
+        resources:
+        - rayclusters
+        - rayjobs
+        - rayservices
+        verbs:
+        - get
+        - list
+        - watch
+        - patch
+        - create
+        - delete
+      - verbs:
+        - get
+        - list
+        - watch
+        - patch
+        - create
+        - delete
+        apiGroups:
+        - kubernetes.dask.org
+        resources:
+        - daskclusters
+        - daskworkergroups
+        - daskjobs
+        - daskjobs/status
+        - daskautoscalers
+        - daskworkergroups/scale
+
   auth:
     enabled: false
     oidc:
@@ -130,6 +162,13 @@ flytebinary:
               name: {{ namespace }}
 
     inline:
+      task_resources:
+        defaults:
+          cpu: 2
+          memory: 2Gi #change default requested resources and limits to fit your needs
+        limits:
+          cpu: 4
+          memory: 4Gi
       plugins:
         k8s:
           inject-finalizer: true
@@ -153,13 +192,6 @@ flytebinary:
             - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
             - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
             - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-
-    task_resources:
-      defaults:
-        cpu: 1
-        memory: 10Gi
-      limits:
-        memory: 10Gi
 
   serviceAccount:
     create: true

@@ -1,0 +1,13 @@
+[project]
+name = "flyte-production"
+version = "0.1.0"
+description = "A Flyte production project"
+readme = "README.md"
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "dask>=2024.8.0",
+    "flytekit",
+    "flytekitplugins-dask>=1.16.9",
+    "flytekitplugins-ray>=1.16.9",
+    "numpy>=2.0.2",
+]

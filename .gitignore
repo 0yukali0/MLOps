@@ -4,5 +4,6 @@
 **/runs
 **/data/
 **/charts
+**/*.pt
 **/lightning_train/lightning_logs/
 charts/charts

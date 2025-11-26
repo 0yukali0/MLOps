@@ -16,7 +16,7 @@ dependencies:
   version: 2.3.0
 - name: kuberay-operator
   repository: https://ray-project.github.io/kuberay-helm/
-  version: 1.4.2
+  version: 1.1.0
 - name: dask-kubernetes-operator
   repository: https://helm.dask.org
   version: 2025.7.0
@@ -29,5 +29,5 @@ dependencies:
 - name: metallb
   repository: https://metallb.github.io/metallb
   version: 0.15.2
-digest: sha256:136fc3e7c55cd171c6e0465f37e1ea2e80968e25461d8348dfaa971792bb54a7
-generated: "2025-11-11T10:08:59.43506137+08:00"
+digest: sha256:80ea5af26710b52e5c9b0186661514f8a11ca4669390324fdfabc35df8625e7c
+generated: "2025-11-24T10:54:26.101514482+08:00"
