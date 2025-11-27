@@ -1,14 +1,18 @@
+import typing
 from pathlib import Path
 
 import flytekit as fl
-import pydicom
 import pandas as pd
-import typing
-from src.core.core import align_hand_xray, save_processed_dicom, remove_black_background
+import pydicom
+
+from src.core.core import align_hand_xray, remove_black_background, save_processed_dicom
 from src.core.utils import unzip, zip_dir
 
 image_spec = fl.ImageSpec(
-    name="say-hello-image", requirements="uv.lock", registry="localhost:30000"
+    name="general",
+    requirements="uv.lock",
+    apt_packages=["libgl1", "libglib2.0-0", "libsm6", "libxrender1", "libxext6"],
+    registry="localhost:30000",
 )
 
 
@@ -18,7 +22,6 @@ def process_dcm(source: str) -> typing.Tuple[fl.FlyteFile, fl.FlyteFile]:
     data_dir.mkdir(exist_ok=True)
     local_dir = Path(fl.current_context().working_directory) / "handled_dcm_files"
     local_dir.mkdir(exist_ok=True)
-
     data = fl.FlyteFile(path=source)
     data_path = data.download()
     unzip(data_path, data_dir)

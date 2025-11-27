@@ -1,32 +1,29 @@
 import typing
+from pathlib import Path
 
 import cv2
 import numpy as np
 from pydicom.uid import generate_uid
-import matplotlib.pyplot as plt
-from pathlib import Path
-import numpy as np
-from scipy import ndimage
-from skimage import filters, morphology, measure
-from skimage.transform import rotate
+
 
 def remove_black_background(img, threshold=10):
     # 找出非黑像素
     mask = img > threshold
-    
+
     # 找 bounding box
     coords = np.argwhere(mask)
     y0, x0 = coords.min(axis=0)
     y1, x1 = coords.max(axis=0)
-    
+
     # 裁切
-    cropped = img[y0:y1+1, x0:x1+1]
+    cropped = img[y0 : y1 + 1, x0 : x1 + 1]
     return cropped
 
+
 def align_hand_xray(xray_image: np.ndarray) -> np.ndarray:
-    #plt.imshow(xray_image, cmap='gray')
-    #plt.show()
-    
+    # plt.imshow(xray_image, cmap='gray')
+    # plt.show()
+
     img = xray_image.astype(np.float32)
     img_norm = img - img.min()
     img_norm = img_norm / (img_norm.max() + 1e-6)
@@ -40,7 +37,7 @@ def align_hand_xray(xray_image: np.ndarray) -> np.ndarray:
     # ---------------------------------------------------------
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if len(contours) == 0:
-        return xray_image   # fallback, no change
+        return xray_image  # fallback, no change
 
     c = max(contours, key=cv2.contourArea)
 
@@ -69,7 +66,7 @@ def align_hand_xray(xray_image: np.ndarray) -> np.ndarray:
         (w, h),
         flags=cv2.INTER_LINEAR,
         borderMode=cv2.BORDER_CONSTANT,
-        borderValue=0
+        borderValue=0,
     )
 
     # Cast 回原始 dtype（保持 bit depth）
@@ -85,7 +82,9 @@ def align_hand_xray(xray_image: np.ndarray) -> np.ndarray:
     rot_8u = (rot_norm * 255).astype(np.uint8)
 
     _, rot_mask = cv2.threshold(rot_8u, 10, 255, cv2.THRESH_BINARY)
-    contours2, _ = cv2.findContours(rot_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours2, _ = cv2.findContours(
+        rot_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+    )
 
     if len(contours2) == 0:
         return rotated
@@ -93,10 +92,10 @@ def align_hand_xray(xray_image: np.ndarray) -> np.ndarray:
     c2 = max(contours2, key=cv2.contourArea)
     x, y, w, h = cv2.boundingRect(c2)
 
-    cropped = rotated[y:y+h, x:x+w]
-    cropped = np.rot90(cropped, k=1) 
-    #plt.imshow(cropped, cmap='gray')
-    #plt.show()
+    cropped = rotated[y : y + h, x : x + w]
+    cropped = np.rot90(cropped, k=1)
+    # plt.imshow(cropped, cmap='gray')
+    # plt.show()
     return cropped
 
 
