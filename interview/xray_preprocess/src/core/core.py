@@ -24,8 +24,8 @@ def remove_black_background(img, threshold=10):
     return cropped
 
 def align_hand_xray(xray_image: np.ndarray) -> np.ndarray:
-    plt.imshow(xray_image, cmap='gray')
-    plt.show()
+    #plt.imshow(xray_image, cmap='gray')
+    #plt.show()
     
     img = xray_image.astype(np.float32)
     img_norm = img - img.min()
@@ -94,8 +94,9 @@ def align_hand_xray(xray_image: np.ndarray) -> np.ndarray:
     x, y, w, h = cv2.boundingRect(c2)
 
     cropped = rotated[y:y+h, x:x+w]
-    plt.imshow(cropped, cmap='gray')
-    plt.show()
+    cropped = np.rot90(cropped, k=1) 
+    #plt.imshow(cropped, cmap='gray')
+    #plt.show()
     return cropped
 
 
