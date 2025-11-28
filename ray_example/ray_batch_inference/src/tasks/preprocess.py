@@ -5,15 +5,15 @@ import pyarrow.fs as pafs
 from flytekitplugins.ray import HeadNodeConfig, RayJobConfig, WorkerNodeConfig
 
 image_spec = fl.ImageSpec(
-    name="say-hello-image",
+    name="ray",
     requirements="uv.lock",
     apt_packages=["wget"],
     registry="localhost:30000"
 )
 
 ray_config = RayJobConfig(
-    head_node_config=HeadNodeConfig(limits=fl.Resources(mem="7Gi", cpu="4")),
-    worker_node_config=[WorkerNodeConfig(group_name="ray-group", replicas=0, limits=fl.Resources(mem="4Gi", cpu="2"))],
+    head_node_config=HeadNodeConfig(limits=fl.Resources(mem="2Gi", cpu="1")),
+    worker_node_config=[WorkerNodeConfig(group_name="ray-group", replicas=1, limits=fl.Resources(mem="2Gi", cpu="1"))],
     runtime_env={},
     enable_autoscaling=False,
     shutdown_after_job_finishes=True,
@@ -23,14 +23,14 @@ ray_config = RayJobConfig(
 
 @fl.task(
     task_config=ray_config,
-    requests=fl.Resources(mem="2Gi", cpu="1"),
+    requests=fl.Resources(mem="6Gi", cpu="3"),
     container_image=image_spec,
 )
 def get_data():
     s3_fs = pafs.S3FileSystem(
-        access_key=os.getenv("BOLB_KEY", default="minio"),
-        secret_key=os.getenv("BOLB_PW", default="miniostorage"),
-        endpoint_override=os.getenv("BOLB_ENDPOINT", default="http://minio.svc.default.cluster.local:9000"),
+        access_key=os.getenv("FLYTE_AWS_ACCESS_KEY_ID", default="minio"),
+        secret_key=os.getenv("FLYTE_AWS_SECRET_ACCESS_KEY", default="miniostorage"),
+        endpoint_override=os.getenv("FLYTE_AWS_ENDPOINT", default="http://minio.default.svc.cluster.local:9000"),
         scheme="http"
     )
 
