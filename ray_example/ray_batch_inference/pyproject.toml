@@ -1,0 +1,14 @@
+[project]
+name = "flyte-production"
+version = "0.1.0"
+description = "A Flyte production project"
+readme = "README.md"
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "flytekit",
+    "flytekitplugins-ray>=1.16.10",
+    "kubernetes>=34.1.0",
+    "pandas>=2.3.3",
+    "pillow>=11.3.0",
+    "pyarrow>=21.0.0",
+]

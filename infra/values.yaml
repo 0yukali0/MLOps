@@ -10,10 +10,10 @@ helmList:
   ml:
     flyte:
       binary: true
-    mlflow: true
-    spark: true
+    mlflow: false
+    spark: false
     ray: true
-    dask: true
+    dask: false
 
 traefik:
   ingressRoute:
@@ -167,8 +167,8 @@ flytebinary:
           cpu: 2
           memory: 2Gi #change default requested resources and limits to fit your needs
         limits:
-          cpu: 4
-          memory: 4Gi
+          cpu: 10
+          memory: 10Gi
       plugins:
         k8s:
           inject-finalizer: true
