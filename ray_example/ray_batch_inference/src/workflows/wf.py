@@ -1,9 +1,9 @@
-# Hello World
-
 import flytekit as fl
-from src.tasks.preprocess import get_data
+
+from src.tasks.preprocess import embedding_dog
 
 
 @fl.workflow
-def wf():
-    get_data()
+def wf(path: str = "s3://data/dogs") -> fl.FlyteDirectory:
+    o1 = embedding_dog(path=path)
+    return o1
