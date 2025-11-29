@@ -4,7 +4,7 @@ import flytekit as fl
 import ray
 from flytekitplugins.ray import HeadNodeConfig, RayJobConfig, WorkerNodeConfig
 
-from src.core.core import EmbedImages, add_class, download_model
+from src.core.core import EmbedImages, add_class
 
 image_spec = fl.ImageSpec(
     name="ray",
