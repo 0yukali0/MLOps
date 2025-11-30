@@ -18,14 +18,14 @@ ray_config = RayJobConfig(
     worker_node_config=[
         WorkerNodeConfig(
             group_name="ray-group",
-            replicas=1,
+            replicas=0,
             limits=fl.Resources(mem="10Gi", cpu="3", gpu=1),
         )
     ],
     runtime_env={},
     enable_autoscaling=False,
     shutdown_after_job_finishes=True,
-    ttl_seconds_after_finished=120,
+    ttl_seconds_after_finished=30,
 )
 
 
